@@ -10,6 +10,17 @@
   const isAppKey = key => key.startsWith('teachys') && key !== 'teachysCloudUserId';
   let client, userId = '', mode = 'signin', syncing = false, applyingCloud = false, readyPromise;
   const dirty = new Map();
+  let lastSavedAt = 0;
+  function setSyncBadge(label, state = 'saved') {
+    const badge = document.getElementById('cloudSyncLabel');
+    if (!badge) return;
+    badge.dataset.state = state;
+    const time = lastSavedAt ? new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(new Date(lastSavedAt)) : '';
+    const hint = time ? `Simpanan terakhir pukul ${time}.` : 'Belum ada waktu simpan terakhir.';
+    badge.title = state === 'failed' ? `Gagal tersimpan — ketuk untuk coba lagi. ${hint}` : `${label}. ${hint}`;
+    badge.setAttribute('aria-label', badge.title);
+    badge.innerHTML = `${window.TeachyIcon?.('cloud-check', 14) || ''}<span>${label}</span>`;
+  }
   const localKeys = () => [...new Set([...Object.keys(localStorage), ...window.teachysStorage.pending.keys()])].filter(isAppKey);
   const values = keys => keys.map(key => {
     const raw = window.teachysStorage.pending.get(key) ?? localStorage.getItem(key);
@@ -31,7 +42,8 @@
     if (text) text.innerHTML = `<strong>${name.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><small>Data tersinkron · ${user.email || ''}</small>`;
     logout.hidden = false;
     document.getElementById('cloudLogoutTop').hidden = false;
-    document.getElementById('cloudSyncLabel').textContent = 'Tersinkron';
+    lastSavedAt = Date.now();
+    setSyncBadge(navigator.onLine ? 'Tersimpan' : 'Offline', navigator.onLine ? 'saved' : 'offline');
     document.getElementById('cloudStatus').textContent = 'Tersambung ke penyimpanan Teachy’s';
   }
   async function applyCloudRows(rows, previousUser) {
@@ -102,14 +114,17 @@
     const key = event?.detail?.key;
     if (!userId || applyingCloud || !key || !isAppKey(key)) return;
     dirty.set(key, !!event.detail.removed);
+    setSyncBadge(navigator.onLine ? 'Menyimpan…' : 'Offline', navigator.onLine ? 'saving' : 'offline');
     clearTimeout(flushTimer);
     flushTimer = setTimeout(flushPending, 550);
   }
   async function flushPending() {
     if (!userId || syncing || !dirty.size) return;
+    if (!navigator.onLine) { setSyncBadge('Offline', 'offline'); return; }
     const batch = [...dirty.entries()];
     batch.forEach(([key]) => dirty.delete(key));
     syncing = true;
+    setSyncBadge('Menyimpan…', 'saving');
     try {
       const deleted = batch.filter(([, removed]) => removed).map(([key]) => key);
       const changed = batch.filter(([, removed]) => !removed).map(([key]) => key).filter(key => localStorage.getItem(key) !== null || window.teachysStorage.pending.has(key));
@@ -122,11 +137,12 @@
         if (error) throw error;
       }
       document.getElementById('cloudStatus').textContent = 'Semua perubahan tersimpan';
-      document.getElementById('cloudSyncLabel').textContent = 'Tersimpan';
+      lastSavedAt = Date.now();
+      setSyncBadge('Tersimpan', 'saved');
     } catch (error) {
       batch.forEach(([key, removed]) => dirty.set(key, removed));
       document.getElementById('cloudStatus').textContent = 'Perubahan menunggu jaringan';
-      document.getElementById('cloudSyncLabel').textContent = 'Menunggu jaringan';
+      setSyncBadge(navigator.onLine ? 'Gagal tersimpan — ketuk untuk coba lagi' : 'Offline', navigator.onLine ? 'failed' : 'offline');
       console.warn('Sinkronisasi Teachy’s tertunda.', error.message);
       if (navigator.onLine) {
         clearTimeout(flushTimer);
@@ -200,7 +216,14 @@
   };
   window.addEventListener('teachys:local-write', scheduleFlush);
   window.addEventListener('storage', event => { if (isAppKey(event.key || '')) scheduleFlush({ detail: { key: event.key, removed: event.newValue === null } }); });
-  window.addEventListener('online', flushPending);
+  window.addEventListener('online', () => { if (dirty.size) flushPending(); else setSyncBadge('Tersimpan', 'saved'); });
+  window.addEventListener('offline', () => setSyncBadge('Offline', 'offline'));
+  document.getElementById('cloudSyncLabel')?.addEventListener('click', () => {
+    const badge = document.getElementById('cloudSyncLabel');
+    if (badge?.dataset.state !== 'failed') return;
+    if (!navigator.onLine) { setSyncBadge('Offline', 'offline'); return; }
+    flushPending();
+  });
   window.addEventListener('teachys:cloud-change', () => {
     window.dispatchEvent(new CustomEvent('teachys:students-updated'));
     window.dispatchEvent(new CustomEvent('teachys:assets-migrated'));

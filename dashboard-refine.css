@@ -1,0 +1,72 @@
+/* Small laptop dashboard fit. Dimension values live in tokens.css. */
+@media (min-width: 1025px) {
+  .topbar { height: var(--topbar-h) !important; margin-bottom: var(--dashboard-header-gap) !important; gap: var(--dashboard-header-items-gap) !important; }
+  .hero, .hero#hero { height: var(--hero-h) !important; min-height: var(--hero-h) !important; padding: var(--dashboard-hero-pad-y) var(--dashboard-hero-pad-x) !important; }
+  .hero-copy { max-width: var(--dashboard-hero-copy-width) !important; width: var(--dashboard-hero-copy-width); margin-left: var(--dashboard-hero-copy-offset) !important; padding: var(--dashboard-hero-copy-pad) !important; }
+  .hero .eyebrow { font-size: var(--dashboard-greeting-size) !important; letter-spacing: 0 !important; text-transform: none !important; }
+  .hero h1 { font-size: var(--dashboard-hero-title-size) !important; line-height: 1.2 !important; margin: var(--dashboard-hero-title-gap) 0 !important; }
+  .hero p { font-size: var(--dashboard-hero-subtitle-size) !important; line-height: 1.3 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero.has-custom-banner .hero-copy { background: var(--dashboard-hero-overlay) !important; backdrop-filter: blur(var(--dashboard-hero-blur)); -webkit-backdrop-filter: blur(var(--dashboard-hero-blur)); box-shadow: 0 2px var(--dashboard-hero-shadow) #51396b18; }
+  .stats { margin: var(--dashboard-stats-gap) 0 var(--dashboard-menu-heading-gap) !important; gap: var(--dashboard-stat-gap) !important; }
+  .stat { height: var(--stat-h) !important; min-height: var(--stat-h) !important; padding: var(--dashboard-stat-pad) !important; gap: var(--dashboard-stat-inner-gap) !important; }
+  .staticon { width: var(--dashboard-stat-icon-size) !important; height: var(--dashboard-stat-icon-size) !important; border-radius: var(--dashboard-stat-icon-radius) !important; }
+  .stat strong { font-size: var(--dashboard-stat-number-size) !important; }
+  .stat small { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--dashboard-stat-label-size) !important; line-height: 1.25; }
+  .stat > div:last-child { min-width: 0; overflow: hidden; }
+  .stat strong #statAttendanceTotal { font-size: var(--dashboard-stat-secondary-size) !important; }
+  #dashboard .sectionhead { min-height: var(--dashboard-section-heading-height); margin: 0 1px var(--dashboard-menu-grid-gap) !important; gap: var(--dashboard-heading-inline-gap); }
+  #dashboard .sectionhead h2 { display: flex; align-items: center; gap: var(--dashboard-heading-inline-gap); white-space: nowrap; font-size: var(--dashboard-section-title-size) !important; line-height: 1.2; }
+  #dashboard .sectionhead h2 .lucide-icon { width: var(--dashboard-section-icon-size); height: var(--dashboard-section-icon-size); }
+  #dashboard .sectionhead .sub { margin-left: auto; text-align: right; font-size: var(--dashboard-section-note-size); white-space: nowrap; }
+  #menuGrid.menu-grid { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: var(--dashboard-menu-grid-gap) !important; }
+  #menuGrid .menu-card { height: var(--menu-tile-h) !important; min-height: var(--menu-tile-h) !important; padding: var(--dashboard-menu-tile-pad) !important; gap: var(--dashboard-menu-tile-gap) !important; }
+  #menuGrid .menu-card .big { width: var(--dashboard-menu-icon-box) !important; height: var(--dashboard-menu-icon-box) !important; border-radius: var(--dashboard-menu-icon-radius) !important; }
+  #menuGrid .menu-card .big .lucide-icon { width: var(--dashboard-menu-icon-size) !important; height: var(--dashboard-menu-icon-size) !important; }
+  #menuGrid .menu-card strong { max-width: 100%; font-size: var(--dashboard-menu-label-size) !important; line-height: 1.2 !important; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  #dashboard .layout { gap: var(--dashboard-column-gap) !important; }
+  #calendarWidget.calendar { padding: var(--dashboard-calendar-pad) !important; max-height: var(--dashboard-calendar-max-height); }
+  #calendarWidget .cal-head { margin-bottom: var(--dashboard-calendar-heading-gap); }
+  #calendarWidget .cal-head strong { font-size: var(--dashboard-calendar-month-size); }
+  #calendarWidget .cal-controls button { width: var(--dashboard-calendar-arrow-size); height: var(--dashboard-calendar-arrow-size); }
+  #calendarWidget .week { gap: var(--dashboard-calendar-cell-gap); }
+  #calendarWidget .week span { padding: var(--dashboard-calendar-week-pad) 0; font-size: var(--dashboard-calendar-week-size); }
+  #calendarWidget .days { gap: var(--dashboard-calendar-cell-gap); }
+  #calendarWidget .days button { height: var(--dashboard-calendar-cell-height) !important; min-height: var(--dashboard-calendar-cell-height) !important; font-size: var(--dashboard-calendar-date-size); line-height: 1; }
+  #dashboard .rightcol { gap: var(--dashboard-right-gap) !important; }
+  #dashboard #agendaWidget, #dashboard #reminderWidget { padding: var(--dashboard-right-card-pad) !important; }
+  #dashboard .lesson-list { max-height: var(--dashboard-lesson-list-max-height); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  #dashboard .lesson-item, #dashboard .reminder { min-height: var(--dashboard-list-row-height) !important; padding: var(--dashboard-list-row-pad) 0 !important; }
+  #dashboard .panel-title { margin-bottom: var(--dashboard-panel-title-gap); }
+  #dashboard .lesson-heading { display: grid; gap: var(--dashboard-heading-small-gap); min-width: 0; }
+  #dashboard .lesson-heading > span { font-size: var(--dashboard-panel-title-size); line-height: 1.2; }
+  #dashboard .lesson-heading small { font-size: var(--dashboard-panel-date-size); font-weight: 500; line-height: 1.2; white-space: nowrap; }
+}
+
+.brandtext small { white-space: nowrap; font-size: var(--sidebar-tagline-size) !important; }
+.side-note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cloud-sync-status { border: 1px solid var(--sync-border); border-radius: var(--sync-radius); background: var(--sync-bg); color: var(--sync-color); padding: var(--sync-pad-y) var(--sync-pad-x); display: inline-flex; align-items: center; gap: var(--sync-gap); min-height: var(--sync-height); font-size: var(--sync-font-size); line-height: 1; white-space: nowrap; cursor: pointer; }
+.cloud-sync-status .lucide-icon { width: var(--sync-icon-size); height: var(--sync-icon-size); }
+.cloud-sync-status[data-state="saving"] { color: var(--sync-saving-color); }
+.cloud-sync-status[data-state="failed"] { color: var(--sync-failed-color); border-color: var(--sync-failed-border); background: var(--sync-failed-bg); }
+.cloud-sync-status[data-state="offline"] { color: var(--sync-offline-color); border-color: var(--sync-offline-border); background: var(--sync-offline-bg); }
+.cloud-logout-proxy[hidden] { display: none !important; }
+.lesson-heading { display: grid; gap: var(--dashboard-heading-small-gap); min-width: 0; }
+.lesson-heading > span { font-size: var(--dashboard-panel-title-size); line-height: 1.2; }
+.lesson-heading small { display: block; font-size: var(--dashboard-panel-date-size); font-weight: 500; line-height: 1.2; white-space: nowrap; }
+.profile-popover-content { display: grid; gap: var(--profile-menu-gap); }
+.profile-popover-content p { margin: 0; }
+.profile-popover-action { width: 100%; text-align: left; padding: var(--profile-menu-pad); border: 1px solid var(--profile-menu-border); border-radius: var(--profile-menu-radius); background: var(--profile-menu-bg); color: var(--plum); font-size: var(--profile-menu-font-size); font-weight: 700; }
+.profile-popover-action:hover { background: var(--profile-menu-hover); }
+
+@media (max-width: 1024px) {
+  :root { --dashboard-calendar-cell-height: var(--dashboard-calendar-touch-height); --dashboard-right-card-pad: var(--dashboard-tablet-card-pad); }
+  #dashboard .lesson-list { max-height: var(--dashboard-tablet-lesson-list-max-height); }
+}
+@media (max-width: 767px) {
+  .cloud-sync-status { min-height: var(--sync-mobile-height); padding: var(--sync-mobile-pad); }
+  .cloud-sync-status .lucide-icon { width: var(--sync-mobile-icon-size); height: var(--sync-mobile-icon-size); }
+  .cloud-sync-status span { display: none; }
+  .lesson-heading > span { font-size: var(--dashboard-mobile-panel-title-size); }
+  .lesson-heading small { font-size: var(--dashboard-mobile-panel-date-size); }
+  .hero.has-custom-banner .hero-copy { background: var(--dashboard-mobile-hero-overlay) !important; backdrop-filter: blur(var(--dashboard-mobile-hero-blur)); -webkit-backdrop-filter: blur(var(--dashboard-mobile-hero-blur)); }
+}

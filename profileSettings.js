@@ -1,11 +1,20 @@
 (() => {
   const KEY = 'teachysProfile';
-  const defaults = { schoolName: '', className: '', teacherName: '', teacherNip: '', principalName: '', principalNip: '', signingPlace: '' };
+  const defaults = { schoolName: '', className: '', teacherName: '', greetingName: '', teacherNip: '', principalName: '', principalNip: '', signingPlace: '' };
   const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 
   function read() {
-    try { return { ...defaults, ...JSON.parse(window.teachysStorage.pending.get(KEY) ?? localStorage.getItem(KEY) ?? '{}') }; }
+    try {
+      const profile = { ...defaults, ...JSON.parse(window.teachysStorage.pending.get(KEY) ?? localStorage.getItem(KEY) ?? '{}') };
+      if (!profile.greetingName) profile.greetingName = defaultGreetingName(profile.teacherName);
+      return profile;
+    }
     catch { return { ...defaults }; }
+  }
+
+  function defaultGreetingName(teacherName) {
+    const first = String(teacherName || '').trim().replace(/^(ibu|bu|bapak|pak)\s+/i, '').split(/[\s,]+/)[0];
+    return first ? `Bu ${first}` : 'Bu Guru';
   }
 
   function migrateIdentityOnce() {
@@ -53,18 +62,31 @@
     const name = document.querySelector('#profileBtn .profiletext strong'), role = document.querySelector('#profileBtn .profiletext small'), greeting = document.querySelector('#hero .eyebrow');
     if (name) name.textContent = teacher;
     if (role) role.textContent = `Wali Kelas ${className}`;
-    if (greeting) greeting.textContent = `SELAMAT PAGI, ${teacher.toLocaleUpperCase('id-ID')} ✨`;
+    if (greeting) greeting.textContent = `${dayGreeting()}, ${greetingName(profile)}!`;
+  }
+
+  function greetingName(profile = read()) {
+    if (profile.greetingName) return profile.greetingName;
+    return defaultGreetingName(profile.teacherName);
+  }
+
+  function dayGreeting(date = new Date()) {
+    const hour = date.getHours();
+    return hour >= 4 && hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 19 ? 'Selamat sore' : 'Selamat malam';
   }
 
   function openProfilePopover() {
     const profile = read();
     const school = profile.schoolName ? `<p>${escape(profile.schoolName)}</p>` : '';
     const teacher = escape(profile.teacherName || 'Ibu Guru'), className = escape(profile.className || 'VI');
-    window.popover('Profil Guru', `${school}<p>${teacher}<br>Wali Kelas ${className}</p><button class="pill" onclick="navigate('Pengaturan');document.querySelector('#overlay').innerHTML=''">Profil & pengaturan →</button>`);
+    const canLogout = !document.getElementById('cloudLogoutTop')?.hidden;
+    window.popover('Profil Guru', `<div class="profile-popover-content">${school}<p>${teacher}<br>Wali Kelas ${className}</p><button class="profile-popover-action" id="profileSettingsAction">Profil & Pengaturan</button>${canLogout ? '<button class="profile-popover-action" id="profileLogoutAction">Keluar</button>' : ''}</div>`);
+    document.getElementById('profileSettingsAction')?.addEventListener('click', () => { document.querySelector('#overlay').innerHTML = ''; window.navigate('Pengaturan'); });
+    document.getElementById('profileLogoutAction')?.addEventListener('click', () => document.getElementById('cloudLogoutTop')?.click());
   }
 
   migrateIdentityOnce();
-  window.teachysProfile = { get: read, save, identityRows, signatureMarkup, updateHeader };
+  window.teachysProfile = { get: read, save, identityRows, signatureMarkup, updateHeader, greetingName };
   updateHeader();
   if (document.getElementById('profileBtn')) document.getElementById('profileBtn').onclick = openProfilePopover;
   window.addEventListener('teachys:profile-updated', updateHeader);
