@@ -8,7 +8,7 @@
   const logout = document.getElementById('cloudLogout');
   const clientApi = window.supabase;
   const isAppKey = key => key.startsWith('teachys') && key !== 'teachysCloudUserId';
-  let client, userId = '', mode = 'signin', syncing = false, applyingCloud = false, readyPromise;
+  let client, userId = '', preparingUserId = '', mode = 'signin', syncing = false, applyingCloud = false, hydrating = false, readyPromise;
   const dirty = new Map();
   let lastSavedAt = 0;
   function setSyncBadge(label, state = 'saved') {
@@ -58,11 +58,12 @@
     if (previousUser && previousUser !== userId) {
       oldKeys.forEach(key => { localStorage.removeItem(key); changed = true; });
     } else if (rows.length) {
-      oldKeys.filter(key => !cloudKeys.has(key)).forEach(key => { localStorage.removeItem(key); changed = true; });
+      oldKeys.filter(key => !cloudKeys.has(key) && !dirty.has(key)).forEach(key => { localStorage.removeItem(key); changed = true; });
     }
     applyingCloud = true;
     try {
       for (const row of rows) {
+        if (dirty.has(row.key)) continue;
         const raw = typeof row.value === 'string' ? row.value : JSON.stringify(row.value);
         if (localStorage.getItem(row.key) !== raw) changed = true;
         window.safeTeachysSetItem(row.key, raw);
@@ -84,24 +85,43 @@
       setGate(true);
       return;
     }
-    if (user.id === userId && readyPromise) return readyPromise;
+    if (user.id === userId && (readyPromise || preparingUserId === user.id)) return readyPromise || Promise.resolve();
     const cachedUserId = localStorage.getItem('teachysCloudUserId') || '';
-    const canOpenCachedApp = cachedUserId === user.id;
+    const canReuseLocalData = !cachedUserId || cachedUserId === user.id;
     userId = user.id;
-    if (canOpenCachedApp) {
-      welcome(user, true);
-      document.getElementById('app').classList.remove('cloud-loading');
+    preparingUserId = user.id;
+    if (!canReuseLocalData) {
+      // Never show the previous account's cached class data after an account switch.
+      dirty.clear();
+      localKeys().forEach(key => { localStorage.removeItem(key); window.teachysStorage.pending.delete(key); });
+      try { await window.imageStore?.clearLocalFiles?.(); }
+      catch (error) { console.warn('Cache berkas akun sebelumnya belum dapat dibersihkan.', error.message); }
+      localStorage.setItem('teachysCloudUserId', user.id);
+      window.teachysRefreshDashboard?.();
     }
+    // The account is valid now. The navigation was initialized with the page, so open the
+    // shell before the cloud read finishes; cached data remains visible for returning users.
+    hydrating = true;
+    welcome(user, true);
+    document.getElementById('app').classList.remove('cloud-loading');
+    preparingUserId = '';
     readyPromise = (async () => {
       const previousUser = localStorage.getItem('teachysCloudUserId') || '';
-      const { data, error } = await client.from('teachys_data').select('key,value').eq('user_id', userId).not('key', 'like', '_filemeta:%');
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      let data, error;
+      try {
+        ({ data, error } = await client.from('teachys_data').select('key,value').eq('user_id', userId).not('key', 'like', '_filemeta:%').abortSignal(controller.signal));
+      } finally { clearTimeout(timeout); }
       if (error) throw error;
       const localChanged = await applyCloudRows(data || [], previousUser);
       welcome(user);
+      hydrating = false;
       const pendingSetup = [];
       window.dispatchEvent(new CustomEvent('teachys:cloud-ready', { detail: { user, previousUser, supabase: client, waitUntil: promise => pendingSetup.push(promise) } }));
       await Promise.all(pendingSetup);
       startRealtime();
+      if (dirty.size) flushPending();
       if (localChanged) {
         window.teachysRefreshDashboard?.();
         window.dispatchEvent(new CustomEvent('teachys:students-updated'));
@@ -116,12 +136,14 @@
       document.getElementById('app').classList.remove('cloud-loading');
     } catch (error) {
       readyPromise = null;
-      flash(`Belum dapat memuat data cloud: ${error.message}`, 'error');
-      if (canOpenCachedApp) {
-        setGate(false);
-        setSyncBadge(navigator.onLine ? 'Belum tersinkron' : 'Offline', navigator.onLine ? 'failed' : 'offline');
-        document.getElementById('cloudStatus').textContent = 'Data tersimpan di perangkat. Sinkronisasi akan dicoba lagi.';
-      } else setGate(true);
+      hydrating = false;
+      const timedOut = error?.name === 'AbortError';
+      const notice = timedOut ? 'Pemuatan data terlalu lama. Data lokal tetap bisa dibuka; coba sinkronkan lagi.' : `Data cloud belum termuat: ${error.message || 'koneksi terputus'}. Data lokal tetap bisa dibuka; coba lagi.`;
+      flash(notice, 'error');
+      setGate(false);
+      setSyncBadge(navigator.onLine ? 'Belum tersinkron' : 'Offline', navigator.onLine ? 'failed' : 'offline');
+      document.getElementById('cloudStatus').textContent = notice;
+      if (dirty.size && navigator.onLine) flushPending();
     }
   }
   let flushTimer;
@@ -129,6 +151,7 @@
     const key = event?.detail?.key;
     if (!userId || applyingCloud || !key || !isAppKey(key)) return;
     dirty.set(key, !!event.detail.removed);
+    if (hydrating) return;
     setSyncBadge(navigator.onLine ? 'Menyimpan…' : 'Offline', navigator.onLine ? 'saving' : 'offline');
     clearTimeout(flushTimer);
     flushTimer = setTimeout(flushPending, 550);
@@ -257,7 +280,10 @@
         : await client.auth.signUp({ email, password, options: { emailRedirectTo: location.origin === 'null' ? undefined : location.href } });
       if (result.error) throw result.error;
       if (mode === 'signup' && !result.data.session) flash('Akun dibuat, tetapi belum bisa masuk otomatis. Coba masuk dengan email dan kata sandi.', 'success');
-      else await syncSession(result.data.user);
+      else {
+        // Do not keep the login form disabled while the dashboard data hydrates.
+        void syncSession(result.data.user);
+      }
     } catch (error) { flash(error.message || 'Masuk gagal. Periksa email dan kata sandi.', 'error'); }
     finally { submit.disabled = false; }
   });
@@ -281,3 +307,4 @@
   }).catch(error => flash(`Koneksi belum berhasil: ${error.message}`, 'error'));
   client.auth.onAuthStateChange((_event, session) => { if (session?.user) syncSession(session.user); else if (_event === 'SIGNED_OUT') syncSession(null); });
 })();
+
