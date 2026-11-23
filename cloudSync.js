@@ -35,16 +35,21 @@
     gate.classList.toggle('hidden', !open);
     document.body.classList.toggle('cloud-locked', open);
   }
-  function welcome(user) {
+  function welcome(user, loading = false) {
     setGate(false);
     const text = document.querySelector('.profiletext');
     const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Guru';
     if (text) text.innerHTML = `<strong>${name.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><small>Data tersinkron · ${user.email || ''}</small>`;
     logout.hidden = false;
     document.getElementById('cloudLogoutTop').hidden = false;
-    lastSavedAt = Date.now();
-    setSyncBadge(navigator.onLine ? 'Tersimpan' : 'Offline', navigator.onLine ? 'saved' : 'offline');
-    document.getElementById('cloudStatus').textContent = 'Tersambung ke penyimpanan Teachy’s';
+    if (loading) {
+      setSyncBadge('Memuat…', 'saving');
+      document.getElementById('cloudStatus').textContent = 'Menampilkan salinan terbaru sambil memeriksa sinkronisasi…';
+    } else {
+      lastSavedAt = Date.now();
+      setSyncBadge(navigator.onLine ? 'Tersimpan' : 'Offline', navigator.onLine ? 'saved' : 'offline');
+      document.getElementById('cloudStatus').textContent = 'Tersambung ke penyimpanan Teachy’s';
+    }
   }
   async function applyCloudRows(rows, previousUser) {
     const cloudKeys = new Set(rows.map(row => row.key));
@@ -80,7 +85,13 @@
       return;
     }
     if (user.id === userId && readyPromise) return readyPromise;
+    const cachedUserId = localStorage.getItem('teachysCloudUserId') || '';
+    const canOpenCachedApp = cachedUserId === user.id;
     userId = user.id;
+    if (canOpenCachedApp) {
+      welcome(user, true);
+      document.getElementById('app').classList.remove('cloud-loading');
+    }
     readyPromise = (async () => {
       const previousUser = localStorage.getItem('teachysCloudUserId') || '';
       const { data, error } = await client.from('teachys_data').select('key,value').eq('user_id', userId).not('key', 'like', '_filemeta:%');
@@ -106,7 +117,11 @@
     } catch (error) {
       readyPromise = null;
       flash(`Belum dapat memuat data cloud: ${error.message}`, 'error');
-      setGate(true);
+      if (canOpenCachedApp) {
+        setGate(false);
+        setSyncBadge(navigator.onLine ? 'Belum tersinkron' : 'Offline', navigator.onLine ? 'failed' : 'offline');
+        document.getElementById('cloudStatus').textContent = 'Data tersimpan di perangkat. Sinkronisasi akan dicoba lagi.';
+      } else setGate(true);
     }
   }
   let flushTimer;
@@ -222,7 +237,8 @@
     const badge = document.getElementById('cloudSyncLabel');
     if (badge?.dataset.state !== 'failed') return;
     if (!navigator.onLine) { setSyncBadge('Offline', 'offline'); return; }
-    flushPending();
+    if (dirty.size) flushPending();
+    else client.auth.getSession().then(({ data }) => { if (data.session?.user) syncSession(data.session.user); });
   });
   window.addEventListener('teachys:cloud-change', () => {
     window.dispatchEvent(new CustomEvent('teachys:students-updated'));
