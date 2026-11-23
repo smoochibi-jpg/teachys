@@ -1,6 +1,15 @@
 (() => {
   const safeRead = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch { return fallback; } };
-  const icon = (element, name, size) => { if (element && window.TeachyIcon) element.innerHTML = window.TeachyIcon(name, size); };
+  // Do not rewrite identical SVG markup. The menu observer below watches child-list
+  // mutations, so setting innerHTML on every pass would retrigger it indefinitely.
+  const icon = (element, name, size) => {
+    if (!element || !window.TeachyIcon) return;
+    const signature = `${name}:${size || 18}`;
+    if (element.dataset.teachysIcon === signature) return;
+    const markup = window.TeachyIcon(name, size);
+    element.innerHTML = markup;
+    element.dataset.teachysIcon = signature;
+  };
   const menuIcons = {
     'Data siswa': 'users', 'Absensi': 'clipboard-check', 'Daftar nilai': 'clipboard-list',
     'Buku administrasi kelas': 'book-open', 'Modul ajar & LKPD': 'graduation-cap',
@@ -54,3 +63,4 @@
   });
   window.addEventListener('focus', decorateCalendar);
 })();
+
