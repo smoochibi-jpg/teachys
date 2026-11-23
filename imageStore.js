@@ -211,7 +211,9 @@
     daftarFile,
     pulihkanFile,
     muatAset,
+    clearLocalFiles,
     simpanCadanganMigrasi,
     unduhCadanganMigrasi
   };
 })();
+
