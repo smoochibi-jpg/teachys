@@ -1,0 +1,50 @@
+.attendance-daily-card{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:var(--shadow)}
+.attendance-daily-info{margin-right:auto;min-width:200px}
+.attendance-daily-info strong,.attendance-daily-info small{display:block}
+.attendance-daily-info strong{font:700 13px var(--font-base);color:var(--plum)}
+.attendance-daily-info small{margin-top:4px;color:var(--muted);font-size:10px}
+.daily-saved{color:#3c7952;font-weight:700}.daily-pending{color:#8b6b36;font-weight:700}
+.attendance-date-pick{display:grid;gap:4px;color:var(--muted);font-size:9px}
+.attendance-date-pick input{min-height:36px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:10px}
+.attendance-daily-card>button{min-height:38px}
+.attendance-daily-card>button:disabled{opacity:.52;cursor:not-allowed}
+.attendance-not-saved{padding:10px 12px;border-radius:10px;background:var(--lav2);color:var(--muted);font-size:11px}
+.attendance-grid th.att-unsaved-past button{position:relative}
+.attendance-grid th.att-unsaved-past button:after{content:"";position:absolute;left:50%;bottom:1px;width:4px;height:4px;transform:translateX(-50%);border-radius:50%;background:#d69248}
+#overlay .daily-attendance-form{display:flex;flex-direction:column;width:min(620px,100%);max-height:calc(100vh - 36px);overflow:hidden;gap:8px}
+#overlay .daily-attendance-form h2{flex:none}
+#overlay .daily-attendance-form>p{flex:none;margin-bottom:2px}
+.daily-search-label{display:grid;gap:5px;color:var(--plum);font-size:10px;font-weight:700}
+.daily-search-label input,.daily-note input{width:100%;min-height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 10px;color:var(--ink);font-size:11px}
+.daily-attendance-counts{flex:none;padding:9px 11px;border-radius:10px;background:var(--sage);color:#3c7952;font-size:11px;font-weight:700}
+.daily-attendance-list{min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;display:grid;align-content:start;gap:6px;padding:2px 4px 2px 0}
+.daily-attendance-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.daily-attendance-row[hidden]{display:none}
+.daily-student-name{min-width:0;display:grid;gap:2px}
+.daily-student-name strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--plum);font-size:11px}
+.daily-student-name small{color:var(--muted);font-size:9px}
+.daily-status-buttons{display:flex;gap:5px}
+.daily-status-buttons button{width:42px;min-width:42px;height:40px;border:1px solid #e7dfed;border-radius:9px;background:#faf8fc;color:var(--plum);font-size:12px;font-weight:700;transition:background .15s ease,border-color .15s ease,transform .15s ease}
+.daily-status-buttons button:hover{transform:translateY(-1px)}
+.daily-status-buttons button[data-code="S"].selected{background:#e9f1fb;border-color:#a8c4e4;color:#456991}
+.daily-status-buttons button[data-code="I"].selected{background:#fff1db;border-color:#edcf98;color:#906624}
+.daily-status-buttons button[data-code="A"].selected{background:#fde8ee;border-color:#e7a9bb;color:#a34e69}
+.daily-note{grid-column:1/-1;display:grid;gap:4px;color:var(--muted);font-size:9px}
+.daily-no-students{padding:18px;text-align:center;color:var(--muted);font-size:11px}
+#overlay .daily-attendance-form .modalfoot{flex:none;flex-wrap:wrap;gap:7px;margin-top:2px;padding-top:8px;border-top:1px solid var(--line)}
+#overlay .daily-attendance-form .modalfoot button{min-height:38px}
+@media(max-width:600px){
+  .attendance-daily-card{align-items:stretch;gap:8px;padding:11px}
+  .attendance-daily-info{flex-basis:100%;min-width:0}
+  .attendance-date-pick{flex:1 1 145px}
+  .attendance-daily-card>button{flex:1 1 130px}
+  #overlay .daily-attendance-form{width:100%;max-height:calc(100dvh - 24px);padding:15px;border-radius:18px}
+  .daily-attendance-row{grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:8px}
+  .daily-status-buttons{gap:4px}
+  .daily-status-buttons button{width:42px;min-width:42px;height:42px}
+  #overlay .daily-attendance-form .modalfoot button{flex:1 1 42%;padding:9px 8px}
+}
+@media print{
+  .attendance-daily-card{display:none!important}
+  .attendance-grid th.att-unsaved-past button:after{display:none!important}
+}

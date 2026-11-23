@@ -1,0 +1,45 @@
+.reports-view{padding:24px!important;}
+.reports-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:4px 0 19px;}
+.reports-heading h1{font:700 24px var(--font-base);color:var(--plum);margin:4px 0 6px;}
+.reports-heading p{font-size:12px;color:var(--muted);margin:0;line-height:1.55;}
+.reports-period{flex:none;border:1px solid #eadff0;background:#f8f2fc;color:var(--plum);border-radius:999px;padding:9px 13px;font-size:10px;font-weight:700;}
+.reports-controls{display:flex;align-items:end;gap:9px;padding:13px;border:1px solid var(--line);border-radius:15px;background:#fff;margin-bottom:12px;}
+.reports-controls label{display:grid;gap:5px;min-width:210px;font-size:10px;color:var(--muted);font-weight:700;}
+.reports-controls select{height:38px;min-width:190px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--plum);padding:0 10px;font-size:11px;}
+.reports-controls-spacer{flex:1;}
+.reports-types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 14px;}
+.report-type{border:1px solid #eee7f3;border-radius:13px;background:#fff;text-align:left;padding:12px 13px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+.report-type:hover{transform:translateY(-2px);box-shadow:0 7px 18px #47316912;border-color:#d8c4e8;}
+.report-type.active{background:#f3eafb;border-color:#b99bd3;box-shadow:inset 3px 0 #8152ae;}
+.report-type strong,.report-type small{display:block;}
+.report-type strong{font-size:11px;color:var(--plum);}
+.report-type small{font-size:9px;color:var(--muted);line-height:1.4;margin-top:4px;}
+.report-paper{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;min-height:320px;box-shadow:var(--shadow);overflow:hidden;}
+.report-title{text-align:center;margin:0 auto 17px;color:#262333;}
+.report-brand{font-size:10px;font-weight:700;color:#70469f;letter-spacing:.35px;margin-bottom:7px;}
+.report-title h2{font:700 19px var(--font-base);margin:0 0 5px;color:#342347;}
+.report-title p{font-size:10px;margin:3px 0;color:#686274;}
+.report-metrics{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px;}
+.report-metrics span{background:#f5f0fa;border:1px solid #eee7f3;border-radius:9px;padding:7px 10px;font-size:9px;color:#62556f;}
+.report-metrics b{color:#543478;margin-left:4px;}
+.report-table-wrap{max-width:100%;overflow:auto;}
+.report-table{width:100%;border-collapse:collapse;font-size:10px;color:#302a3b;}
+.report-table th,.report-table td{border:1px solid #e8e2ec;padding:7px 8px;text-align:left;vertical-align:top;}
+.report-table thead th{background:#f2e9f8;color:#513674;font-weight:700;}
+.report-table tbody tr:nth-child(even){background:#fcfaff;}
+.attendance-report-table{min-width:950px;table-layout:fixed;font-size:8px;}
+.attendance-report-table th,.attendance-report-table td{text-align:center;padding:4px 2px;min-width:19px;height:24px;}
+.attendance-report-table .report-student{width:140px;min-width:140px;text-align:left;position:sticky;left:0;background:#fff;z-index:1;padding-left:7px;}
+.attendance-report-table thead .report-student{background:#f2e9f8;z-index:2;}
+.attendance-report-table .report-holiday{background:#fde8ec;color:#c54562;}
+.report-holiday-notes{display:grid;grid-template-columns:140px 1fr;gap:10px;margin-top:10px;font-size:9px;color:#62556f;line-height:1.5;}
+.report-empty{padding:22px;border:1px dashed #d9c8e5;border-radius:12px;text-align:center;color:var(--muted);font-size:11px;background:#fcfaff;}
+.report-note{font-size:9px;line-height:1.5;color:var(--muted);margin:7px 0 12px;}
+.report-subhead{font-size:12px;color:var(--plum);margin:18px 0 0;padding-top:12px;border-top:1px solid var(--line);}
+.report-journal{padding:12px 0;border-bottom:1px solid var(--line);break-inside:avoid;}
+.report-journal h3{font-size:12px;color:var(--plum);margin:0 0 7px;}
+.report-journal p{font-size:10px;line-height:1.5;margin:5px 0;white-space:pre-wrap;}
+.report-journal small{font-size:9px;color:var(--muted);}
+@media(max-width:760px){.reports-view{padding:18px!important;}.reports-heading{display:block;}.reports-period{display:inline-flex;margin-top:10px;}.reports-controls{align-items:stretch;flex-wrap:wrap;}.reports-controls label{flex:1;min-width:145px;}.reports-controls select{width:100%;min-width:0;}.reports-controls-spacer{display:none;}.reports-controls .primary,.reports-controls .pill{flex:1;}.reports-types{grid-template-columns:repeat(2,minmax(0,1fr));}.report-paper{padding:15px;}.report-holiday-notes{grid-template-columns:1fr;gap:4px;}}
+@media(max-width:440px){.reports-types{grid-template-columns:1fr;}.reports-controls{display:grid;grid-template-columns:1fr;}.reports-controls label{min-width:0;}.reports-controls .primary,.reports-controls .pill{width:100%;}.report-title h2{font-size:16px;}}
+@media print{@page{size:A4 landscape;margin:10mm}.reports-view{position:absolute!important;inset:0!important;margin:0!important;padding:0!important;background:#fff!important;border:0!important;box-shadow:none!important;overflow:visible!important}.reports-heading,.reports-controls,.reports-types{display:none!important}.report-paper{display:block!important;min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}.report-table-wrap{overflow:visible!important}.report-table{font:8pt Arial,sans-serif!important}.report-table th,.report-table td{padding:4px 5px!important}.attendance-report-table{min-width:0!important;width:100%!important;font:6pt Arial,sans-serif!important;table-layout:fixed!important}.attendance-report-table th,.attendance-report-table td{min-width:0!important;width:auto!important;height:18px!important;padding:1px!important;position:static!important;white-space:normal!important}.attendance-report-table .report-student{width:115px!important;min-width:115px!important;max-width:115px!important}.report-title h2{font:700 16pt Arial,sans-serif!important}.report-title p,.report-brand{font:9pt Arial,sans-serif!important}.report-metrics span{padding:4px 7px!important}.report-subhead,.report-journal{break-inside:avoid}.report-holiday-notes{break-inside:avoid}.attendance-signatures{display:grid!important;grid-template-columns:1fr 1fr;gap:25mm;margin:10mm 18mm 0;text-align:center;break-inside:avoid;font:9pt Arial,sans-serif;color:#222}.attendance-signatures .signature-space{height:18mm}.attendance-signatures p{font:9pt Arial,sans-serif;line-height:1.4}.attendance-signatures strong,.attendance-signatures small{display:block;font:9pt Arial,sans-serif}.signature-settings-note{font-size:8pt!important}}
